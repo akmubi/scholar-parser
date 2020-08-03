@@ -35,7 +35,11 @@ func StartParsing(config Config) (articles []Article) {
 	// 0 - skip first 0 pages
 	// 10 - skip first 10 pages
 	// ...
-	skipSlice := makeIntStringSlice(config.numOfPages)
+	if config.numOfPages == 0 {
+		fmt.Printf("You put 0 to pages count. OK")
+		return articles
+	}
+	skipSlice := makeIntStringSlice(config.numOfPages - 1)
 
 	// "sample search query?" -> "sample%20search%20query?"
 	processedSearchQuery := replaceNonLetters(config.searchQuery)

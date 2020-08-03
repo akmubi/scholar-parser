@@ -8,6 +8,8 @@ To install the package use following command:
 
 `go get github.com/akmubi/scholar-parser`
 
+(It will be more convenient i you use go modules. Please)
+
 ## Function List
 ```golang
 // initialized configuration with given parameters

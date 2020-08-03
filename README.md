@@ -6,9 +6,11 @@ Simple Go project for searching papers on Google Scholar, extracting meta and do
 
 To install the package use following command:
 
-`go get github.com/akmubi/scholar-parser`
+```shell
+$ go get github.com/akmubi/scholar-parser
+```
 
-(It will be more convenient i you use go modules. Please)
+It will be more convenient if you use go modules
 
 ## Function List
 ```golang

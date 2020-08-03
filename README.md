@@ -74,7 +74,7 @@ func main() {
 	parameters := map[string]string {
 		"query"	: query,
 		"lang"	: "en",
-		"pages" : "1",
+		"pages" : "2",
 		"parseAuthors" : "yes",
 		"parseDesc" : "no",
 	}
@@ -124,7 +124,7 @@ func main() {
 $ go run main.go
 Config: {
         Language: en,
-        Number Of Pages: 1,
+        Number Of Pages: 2,
         Search Query: "Reverse compilation techniques",
         Parse Authors: true,
         Parse Descriptions: false

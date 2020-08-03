@@ -47,9 +47,9 @@ func isAllowedLanguage(allowedLanguages string, language string) bool {
 }
 
 
-// 4 -> { "0", "10", "30", "40"}
+// 4 pages -> { "0", "10", "20", "30" }
 func makeIntStringSlice(upperBorder int64) (result []string) {
-	for i := int64(0); i <= upperBorder; i++ {
+	for i := int64(0); i < upperBorder; i++ {
 		result = append(result, strconv.FormatInt(i * 10, 10))
 	}
 	return

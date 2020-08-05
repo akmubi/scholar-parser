@@ -71,12 +71,13 @@ func getFolder(filepath string) string {
 
 // Что+такое+жизнь+-**".~
 
-// allowed charactes: '-', '_', '*', '"', '~', '.'
+// allowed charactes: '-', '_', '*', '"', '~', '.', '<', '>'
 func replaceNonLetters(source string) (result string) {
 
 	for _, rune := range source {
 		if	((rune == '-') || (rune == '*') || (rune == '_') ||
 			(rune == '"') || (rune == '~') || (rune == '.')) ||
+			(rune == '<') || (rune == '>') ||
 			(unicode.IsLetter(rune)) {
 			result += string(rune)
 		} else {

@@ -103,6 +103,20 @@ func StartParsing(config Config) (articles []Article) {
 
 									if textAndURLClass == "gs_rt" {
 
+										bookPrefix := textAndURL.Find("span")
+										
+										if boolPrefix.NodeValue != "" {
+											bookLabel = "[BOOK]"
+											if config.language == "ru" {
+												bookLabel = "[КНИГА]"
+											}
+
+											// we don't need BOOKS, we need articles
+											if bookPrefix.FullText() == bookLabel {
+												continue
+											}
+										}
+
 										// find <a> tag
 										title := textAndURL.Find("a")
 

@@ -1,7 +1,7 @@
 package scholarParser
 
 import (
-	"github.com/akmubi/soup"
+	"./soup"
 	"math/rand"
 	"time"
 	"fmt"
@@ -103,9 +103,10 @@ func StartParsing(config Config) (articles []Article) {
 
 									if textAndURLClass == "gs_rt" {
 
-										bookPrefix := textAndURL.Find("span")
+										bookPrefix :=  textAndURL.Find("span")
+										var bookLabel string
 										
-										if boolPrefix.NodeValue != "" {
+										if bookPrefix.NodeValue != "" {
 											bookLabel = "[BOOK]"
 											if config.language == "ru" {
 												bookLabel = "[КНИГА]"

@@ -59,7 +59,7 @@ func DownloadPDFs(targetFolderPath string, articles []Article) ([]Link, error) {
 									"/" + strconv.FormatInt(int64(len(articles)), 10) +
 									 ")]:", prettyName)
 
-		link.ArticleID = article.ID
+		link.ArticleID = 0
 
 		// Ask for document
 		response, err := http.Get(article.PDFLink)

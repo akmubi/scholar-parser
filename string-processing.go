@@ -1,4 +1,4 @@
-package scholarParser
+package scholarScraper
 
 import (
 	"unicode"
@@ -16,21 +16,21 @@ func removeForbiddenChars(source string) (result string) {
 	return
 }
 
-// "@sample string/hello !!!\u32a7" -> "sample-string-hello-"
+// "@sample string/hello !!!\u32a7" -> "sample_string_hello"
 func MakeStringPretty(source string) (result string) {
 	// source = removeForbiddenChars(source)
 	for _, rune := range source {
 		if (unicode.IsLetter(rune) || unicode.IsDigit(rune)) {
 			result += string(rune)
 		} else if unicode.IsSpace(rune) || rune == '\\' || rune == '/' {
-			result += "-"
+			result += "_"
 		} else {
 			result += ""
 		}
 	}
 
-	// " -sample-string-hello--" -> "sample-string-hello" 
-	result = strings.Trim(result, " -")
+	// " _sample_string_hello__" -> "sample_string_hello" 
+	result = strings.Trim(result, " _")
 	return
 }
 
@@ -68,8 +68,6 @@ func getFolder(filepath string) string {
 	}
 	return ""
 }
-
-// Что+такое+жизнь+-**".~
 
 // allowed charactes: '-', '_', '*', '"', '~', '.', '<', '>'
 func replaceNonLetters(source string) (result string) {

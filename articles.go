@@ -1,43 +1,42 @@
-package scholarParser
+package scholarScraper
 
 import (
-	"./soup"
+	"github.com/akmubi/soup"
 	"math/rand"
 	"time"
 	"fmt"
-	"log"
+	"strconv"
+	"errors"
+	// "log"
 )
 
 type Article struct {
-	ID int64
 	Title string
-	URL string
+	// link to article's web-site
+	HTMLLink string
+	// link to download the PDF file
 	PDFLink string
-	Authors string
-	Description string
+	// authors, publisher year, web-site
+	Info string
 }
 
 func timeout() {
-	time.Sleep( time.Duration(rand.Int() % 8) * time.Second )
+	time.Sleep( time.Duration(10 + rand.Int() % 10) * time.Second )
 }
 
 // returns slice of articles to gived config
-func StartParsing(config Config) (articles []Article) {
+func StartParsing(config Config) (articles []Article, err error) {
 
 	var articleCount int
 
 	var lastResponse string
 
-	if err := config.validate(); err != nil {
-		log.Fatal(err)
-	}
-
 	// 0 - skip first 0 pages
 	// 10 - skip first 10 pages
 	// ...
 	if config.numOfPages == 0 {
-		fmt.Printf("You put 0 to pages count. OK")
-		return articles
+		fmt.Printf("You put 0 to page count. OK")
+		return articles, nil
 	}
 	skipSlice := makeIntStringSlice(config.numOfPages)
 
@@ -47,10 +46,6 @@ func StartParsing(config Config) (articles []Article) {
 	fmt.Printf("Searching '%s'...\n", config.searchQuery)
 
 	for _, startValue := range skipSlice {
-
-		fmt.Println("Pages passed:", startValue)
-
-		timeout()
 
 		// building query
 		// http://scholar.google.com/scholar/?q=my%20query&start=0&hl=ru
@@ -63,7 +58,7 @@ func StartParsing(config Config) (articles []Article) {
 		// send request and get a response
 		lastResponse, err := soup.Get(query)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
 		// parsing recieved HTML document
@@ -72,8 +67,9 @@ func StartParsing(config Config) (articles []Article) {
 
 		// find all <div> tags
 		divs := document.FindAll("div")
+		fmt.Println(divs)
 
-		for _, div := range divs {
+		/*for _, div := range divs {
 
 			// step through all div class names
 			if divClass, hasDivClass := div.Attrs()["class"]; hasDivClass {
@@ -182,18 +178,26 @@ func StartParsing(config Config) (articles []Article) {
 					articles = append(articles, article)
 				} // divClass == "gs_r gs_or gs_scl"
 			} // hasDivClass := div.Attrs()["class"]
-		} // div ~ divs
+		} // div ~ divs*/
+		pagesPassed, err := strconv.ParseInt(startValue, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Println("Pages passed:", pagesPassed + int64(10))
+		timeout()
+		break
 	} // startValue ~ skipSlice
 
 	fmt.Println("Found", articleCount, "pages")
 
 	if articleCount == 0 {
 		if lastResponse == "" {
-			log.Fatal("No response")
+			return nil, errors.New("No response")
 		} else {
-			log.Fatal(lastResponse)
+			return nil, errors.New(lastResponse)
 		}
 	}
-	return
+	return articles, nil
 }
 

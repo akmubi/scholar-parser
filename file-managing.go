@@ -1,4 +1,4 @@
-package scholarParser
+package scholarScraper
 
 import (
 	"encoding/json"

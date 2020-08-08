@@ -17,7 +17,7 @@ func TestRemoveForbiddenChars(test *testing.T) {
 
 	for str, expectedResult := range testCases {
 		if actualResult := removeForbiddenChars(str); actualResult != expectedResult {
-			return t.Error("Mismatch!\nExpected:", expectedResult, "\nGot:", actualResult)
+			test.Errorf("Mismatch!\nExpected: '%s'\nGot: '%s'", expectedResult, actualResult)
 		}
 	}
 }

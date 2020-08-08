@@ -6,22 +6,32 @@ import (
 	"time"
 	"fmt"
 	"strconv"
+	"strings"
 	"errors"
 	// "log"
 )
 
 type Article struct {
-	Title string
-	// link to article's web-site
-	HTMLLink string
-	// link to download the PDF file
-	PDFLink string
+	Title		string
+	// is article actually a HTML document
+	isHTML		bool
+	// link to download the PDF file (if it's available)
+	PDFLink		string
+	// link to a web-site
+	URL			string
 	// authors, publisher year, web-site
-	Info string
+	Info		string
+	pdfFilePath	string
 }
 
 func timeout() {
-	time.Sleep( time.Duration(10 + rand.Int() % 10) * time.Second )
+	duration := 10 + rand.Int() % 10
+	fmt.Println("Timeout -", duration)
+	for i := 0; i < duration; i++ {
+		fmt.Printf("\r[%d]", i)
+		time.Sleep(1 * time.Second)
+	}
+	fmt.Println()
 }
 
 // returns slice of articles to gived config
@@ -67,9 +77,8 @@ func StartParsing(config Config) (articles []Article, err error) {
 
 		// find all <div> tags
 		divs := document.FindAll("div")
-		fmt.Println(divs)
 
-		/*for _, div := range divs {
+		for _, div := range divs {
 
 			// step through all div class names
 			if divClass, hasDivClass := div.Attrs()["class"]; hasDivClass {
@@ -85,9 +94,8 @@ func StartParsing(config Config) (articles []Article, err error) {
 
 					// looking for:
 					// gs_ri		(title text and URL)
-					// gs_or_ggsm	(PDF file URL)
+					// gs_or_ggsm	(PDF/HTML link)
 					// gs_a			(authors)
-					// gs_rs		(description)
 					for _, subDiv := range subDivs {
 						if subDivClass, hasSubDivClass := subDiv.Attrs()["class"]; hasSubDivClass {
 
@@ -144,41 +152,41 @@ func StartParsing(config Config) (articles []Article, err error) {
 												}
 											}
 										}
-									} // titleAndURLClass == "gs_rt"
-								} // exists := titleAndURLAttrs()["class"]
-							} // title and URL (gs_ri)
-
-							// PDF file URL
-							if subDivClass == "gs_or_ggsm" {
-								PDFLink := subDiv.Find("a")
-
-								if PDFLink.NodeValue != "" {
-									if link, exists := PDFLink.Attrs()["href"]; exists {
-										article.PDFLink = link
 									}
 								}
 							}
 
-							// authors
-							if config.parseAuthors && subDivClass == "gs_a" {
-								article.Authors = subDiv.FullText()
+							// PDF/HTML link
+							if subDivClass == "gs_or_ggsm" {
+								Link := subDiv.Find("a")
+								if Link.NodeValue != "" {
+									if docType := Link.Find("span"); docType.NodeValue != "" && docType.Attrs()["class"] == "gs_ctg2" {
+										if docType.FullText() == "[HTML]" {
+											article.isHTML = true
+										} else if docType.FullText() == "[PDF]" {
+											if pdfLink, exists := Link.Attrs()["href"]; exists {
+												article.PDFLink = pdfLink
+											}
+										} else {
+											return nil, errors.New("Unknown link type")
+										}
+									}
+								}
 							}
 
-							// description
-							if config.parseDescriptions && subDivClass == "gs_rs" {
-								article.Description = subDiv.FullText()
+							// authors, publisher, year, web-site name
+							if subDivClass == "gs_a" {
+								article.Info = subDiv.FullText()
 							}
-
-						} // hasSubDivClass := subDiv.Attrs()["class"]; hasSubDivClass 
-					} // subDiv ~ subDivs
+						}
+					}
 
 					// END OF ARTICLE SECTION
-					article.ID = int64(articleCount)
 					articleCount++
 					articles = append(articles, article)
-				} // divClass == "gs_r gs_or gs_scl"
-			} // hasDivClass := div.Attrs()["class"]
-		} // div ~ divs*/
+				}
+			}
+		}
 		pagesPassed, err := strconv.ParseInt(startValue, 10, 64)
 		if err != nil {
 			return nil, err
@@ -186,7 +194,6 @@ func StartParsing(config Config) (articles []Article, err error) {
 
 		fmt.Println("Pages passed:", pagesPassed + int64(10))
 		timeout()
-		break
 	} // startValue ~ skipSlice
 
 	fmt.Println("Found", articleCount, "pages")
@@ -201,3 +208,66 @@ func StartParsing(config Config) (articles []Article, err error) {
 	return articles, nil
 }
 
+type info struct {
+	authors				[]string
+	journalName			string
+	website				string
+	isJournalNameLonger bool
+	year				int64
+}
+
+func emptyInfo() info {
+	return info {
+		authors : nil,
+		journalName : "",
+		website : "",
+		isJournalNameLonger : false,
+		year : -1,
+	}
+}
+
+// Example: "AA Author1, B Author2... - 2018 - dl.acm.org" ==>
+// 			"AA Author1", "B Author2", 2018, dl.acm.org
+func (article Article) splitInfo() (articleInfo info, err error) {
+	parts := strings.Split(article.Info, " - ")
+	partsLength := len(parts)
+
+	var website, journal, year, authors string
+	if partsLength == 4 {
+		website = parts[3]
+		year	= parts[2]
+		journal = parts[1]
+		authors = parts[0]
+	} else if partsLength == 3 {
+		website = parts[2]
+		authors = parts[0]
+
+		// try to find year
+		year = parts[1]
+		year = year[len(year) - 4:]
+		_, err := strconv.ParseInt(year, 10, 64)
+		if err != nil {
+			year = ""
+		}
+
+		journal = parts[1]
+		journal = journal[:len(journal) - 4]
+
+	} else {
+		return emptyInfo(), errors.New("Unknown article info form")
+	}
+
+	articleInfo.website = strings.Trim(website, " ")
+	articleInfo.year, err = strconv.ParseInt(year, 10, 64)
+	if err != nil {
+		return emptyInfo(), err
+	}
+
+	articleInfo.isJournalNameLonger = strings.ContainsRune(journal, '…')
+	articleInfo.journalName = strings.Trim(journal, " ,…")
+
+	// authors
+	authors = strings.Trim(authors, " …")
+	articleInfo.authors = strings.Split(authors, ", ")
+	return articleInfo, nil
+}

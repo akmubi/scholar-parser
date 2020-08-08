@@ -14,16 +14,18 @@ func Print(object printer) {
 
 func (config Config) showContent() {
 	fmt.Println("Config: {")
-	fmt.Println("\tLanguage:"			+ config.language + ",")
-	fmt.Println("\tSearch Query: '"		+ config.searchQuery + "\",")
-	fmt.Println("\tNumber Of Pages:",	config.numOfPages, ",")
+	fmt.Println("\tLanguage:",			config.language, ",")
+	fmt.Println("\tSearch Query: '",	config.searchQuery, "',")
+	fmt.Println("\tNumber Of Pages:",	config.numOfPages)
 	fmt.Println("}")
 }
 
 func (article Article) showContent() {
 	fmt.Println("Article: {")
-	fmt.Println("\tTitle:" 		+ article.Title + ",")
-	fmt.Println("\tHTML Link:"	+ article.HTMLLink + ",")
-	fmt.Println("\tPDF Link:"	+ article.PDFLink + ",")
+	fmt.Println("\tTitle:",			article.Title, ",")
+	fmt.Println("\tIs HTML:",		article.isHTML, ",")
+	fmt.Println("\tPDF Link:",		article.PDFLink, ",")
+	fmt.Println("\tURL:",			article.URL, ",")
+	fmt.Println("\tInformation:",	article.Info)
 	fmt.Println("}")
 }

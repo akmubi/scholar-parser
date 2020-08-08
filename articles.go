@@ -118,6 +118,7 @@ func StartParsing(config Config) (articles []Article, err error) {
 
 											// we don't need BOOKS, we need articles
 											if bookPrefix.FullText() == bookLabel {
+												fmt.Println("Book. Skipping")
 												continue
 											}
 										}
@@ -216,19 +217,18 @@ type info struct {
 	year				int64
 }
 
-func emptyInfo() info {
-	return info {
-		authors : nil,
-		journalName : "",
-		website : "",
-		isJournalNameLonger : false,
-		year : -1,
-	}
+func (i *info) New() {
+	i.authors = nil
+	i.journalName = ""
+	i.website = ""
+	i.isJournalNameLonger = false
+	i.year = 0
 }
 
 // Example: "AA Author1, B Author2... - 2018 - dl.acm.org" ==>
 // 			"AA Author1", "B Author2", 2018, dl.acm.org
 func (article Article) splitInfo() (articleInfo info, err error) {
+	articleInfo.New()
 	parts := strings.Split(article.Info, " - ")
 	partsLength := len(parts)
 
@@ -254,14 +254,14 @@ func (article Article) splitInfo() (articleInfo info, err error) {
 		journal = journal[:len(journal) - 4]
 
 	} else {
-		return emptyInfo(), errors.New("Unknown article info form")
+		return articleInfo, errors.New("Unknown article info form")
 	}
 
-	articleInfo.website = strings.Trim(website, " ")
 	articleInfo.year, err = strconv.ParseInt(year, 10, 64)
 	if err != nil {
-		return emptyInfo(), err
+		return articleInfo, err
 	}
+	articleInfo.website = strings.Trim(website, " ")
 
 	articleInfo.isJournalNameLonger = strings.ContainsRune(journal, '…')
 	articleInfo.journalName = strings.Trim(journal, " ,…")

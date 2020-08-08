@@ -21,3 +21,21 @@ func TestRemoveForbiddenChars(test *testing.T) {
 		}
 	}
 }
+
+
+func TestDomainName(test *testing.T) {
+	testCases := map[string]string {
+		"https://github.com/anaskhan96/soup" : "https://github.com/",
+		"https://scholar.google.com/scholar?q=cyber-physical+system+design" : "https://scholar.google.com/",
+		"https://vk.com/" : "https://vk.com/",
+		"http://some.site/basic/knowledge/understood/" : "http://some.site/",
+		"" : "",
+		"someRandomString" : "someRandomString",
+	}
+
+	for url, extected := range testCases {
+		if actual := domainName(url); actual != extected {
+			test.Error("Domain name mismatch!\nExpected:", extected, "\nGot:", actual)
+		}
+	}
+}

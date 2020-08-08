@@ -103,7 +103,7 @@ func SaveToJSON(filepath string, object interface{}) error {
 	return err
 }
 
-func isPdfCorrect(article Article) (bool, error) {
+func isPDFCorrect(article Article) (bool, error) {
 	fmt.Printf("Checking PDF '%s'...\n", article.pdfFilePath)
 	
 	// Read file
@@ -131,7 +131,7 @@ func removePDF(article Article) error {
 func filterPDFs(articles []Article) (filteredArticles []Article, err error) {
 	for i := 0; i < len(articles); i++ {
 		// check PDF
-		isPDF, err := isPdfCorrect(articles[i])
+		isPDF, err := isPDFCorrect(articles[i])
 		if err != nil {
 			return nil, err
 		}

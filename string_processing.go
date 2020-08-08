@@ -8,6 +8,7 @@ import (
 	"fmt"
 )
 
+// example: "#include <stdio.h>" -> "#include stdio.h"
 func removeForbiddenChars(source string) (result string) {
 	forbiddedChars := "<>:\"/\\|*?.,;"
 	result = source
@@ -47,7 +48,6 @@ func isAllowedLanguage(allowedLanguages string, language string) bool {
 	return false
 }
 
-
 // 4 pages -> { "0", "10", "20", "30" }
 func makeIntStringSlice(upperBorder int64) (result []string) {
 	for i := int64(0); i < upperBorder; i++ {
@@ -56,6 +56,8 @@ func makeIntStringSlice(upperBorder int64) (result []string) {
 	return
 }
 
+// example 1: "someFolder\build\main.exe" -> "someFolder\build\"
+// example 2: "someFolder\build\linux\" -> "someFolder\build\linux\"
 func getFolder(filepath string) string {
 	var i int
 	var length = len(filepath)
@@ -71,6 +73,7 @@ func getFolder(filepath string) string {
 }
 
 // allowed charactes: '-', '_', '*', '"', '~', '.', '<', '>'
+// Example: "**Google Scholar**" -> "**Google%20Scholar**"
 func replaceNonLetters(source string) (result string) {
 
 	for _, rune := range source {
@@ -94,10 +97,10 @@ func unicodeConvert(source string) (result string) {
 	return
 }
 
-// searching author names in string
-// example: (in search result)	C Cifuentes -> 
+// searches full author name in PDF document
+// example: (in article info)	C Cifuentes -> 
 //			(in document)		Cristina Cifuentes
-func FindAuthorName(pdfText string, authorInitials string) (fullname string, err error) {
+func findAuthorName(pdfText string, authorInitials string) (fullname string, err error) {
 	nameParts := strings.Split(authorInitials, " ")
 	// initials = { "C" }
 	// name = { "Cifuentes" }
@@ -178,6 +181,8 @@ func FindAuthorName(pdfText string, authorInitials string) (fullname string, err
 	return strings.TrimRight(fullname, " "), nil
 }
 
+// example 1: "string" -> "gnirts"
+// example 2: "say yes" -> "sey yas"
 func reverseString(sample string) string {
 	runes := []rune(sample)
 	for i := 0; i < len(runes) / 2; i++ {
@@ -186,4 +191,13 @@ func reverseString(sample string) string {
 		runes[len(runes) - 1 - i] = temp 
 	}
 	return string(runes)
+}
+
+func domainName(URL string) string {
+	for i := range URL {
+		if i > 7 && URL[i] == '/' {
+			return URL[:i + 1]
+		}
+	}
+	return URL
 }

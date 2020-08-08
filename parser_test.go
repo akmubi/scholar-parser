@@ -48,6 +48,13 @@ func TestSplitInfo(test *testing.T) {
 			isJournalNameLonger : true,
 			year : 2015,
 		},
+		"M Wolf - 2012 - books.google.com" : {
+			authors : []string { "M Wolf" },
+			journalName : "",
+			website : "books.google.com",
+			isJournalNameLonger : false,
+			year : 2012,
+		},
 	}
 
 	for info, expectedResult := range testCases {
@@ -85,7 +92,7 @@ func TestFindAuthorName(test *testing.T) {
 	}
 
 	for args, expectedName := range testCases {
-		actualName, err := FindAuthorName(args[0], args[1])
+		actualName, err := findAuthorName(args[0], args[1])
 		if err != nil {
 			test.Error("An error occured", err)
 		}

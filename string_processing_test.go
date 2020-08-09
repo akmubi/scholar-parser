@@ -39,3 +39,35 @@ func TestDomainName(test *testing.T) {
 		}
 	}
 }
+
+func TestGetFolder(test *testing.T) {
+	testCases := map[string]string {
+		"" : "",
+		"file" : "",
+		"\\temp\\folder\\file" : "\\temp\\folder\\",
+		"\\temp\\folder\\" : "\\temp\\folder\\",
+		"/temp/folder/file" : "/temp/folder/",
+		"/temp/folder/" : "/temp/folder/",
+	}
+	for path, expected := range testCases {
+		if actual := getFolder(path); actual != expected {
+			test.Error("Mismatch!\nExpected:", expected, "\nGot:", actual)
+		}
+	}
+}
+
+func TestGetFileName(test *testing.T) {
+	testCases := map[string]string {
+		"" : "",
+		"file" : "file",
+		"\\temp\\folder\\file" : "file",
+		"\\temp\\folder\\" : "",
+		"/temp/folder/file" : "file",
+		"/temp/folder/" : "",
+	}
+	for path, expected := range testCases {
+		if actual := getFileName(path); actual != expected {
+			test.Error("Mismatch!\nExpected:", expected, "\nGot:", actual)
+		}
+	}
+} 

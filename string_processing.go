@@ -60,16 +60,24 @@ func makeIntStringSlice(upperBorder int64) (result []string) {
 // example 2: "someFolder\build\linux\" -> "someFolder\build\linux\"
 func getFolder(filepath string) string {
 	var i int
-	var length = len(filepath)
-	if (filepath[length - 1] == '/') || (filepath[length - 1] == '\\') {
-		return filepath
-	}
-	for i = length - 1; i >= 0; i-- {
-		if (filepath[i] == '/') || (filepath[i] == '\\') {
-			return filepath[:i + 1]
+	for i = len(filepath) - 1; i >= 0; i-- {
+		if filepath[i] == '/' || filepath[i] == '\\' {
+			break
 		}
 	}
-	return ""
+	return filepath[:i + 1]
+}
+
+// example 1: "someFolder\build\main.exe" -> "main.exe
+// example 2: "someFolder\build\linux\" -> ""
+func getFileName(filepath string) string {
+	var i int
+	for i = len(filepath) - 1; i >= 0; i-- {
+		if filepath[i] == '\\' || filepath[i] == '/' {
+			break
+		}
+	}
+	return filepath[i + 1:]
 }
 
 // allowed charactes: '-', '_', '*', '"', '~', '.', '<', '>'

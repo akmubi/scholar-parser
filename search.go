@@ -2,6 +2,7 @@ package scholarScraper
 
 import (
 	"errors"
+	"unicode"
 )
 
 func defaultCheckLastChar(char byte) bool {
@@ -84,4 +85,14 @@ func prefixTable(pattern string) (table []int, err error) {
 		}
 	}
 	return table, nil
+}
+
+func getFirstNumber(text string) (number string) {
+	for _, char := range text {
+		if !unicode.IsDigit(char) {
+			break
+		}
+		number += string(char)
+	}
+	return
 }

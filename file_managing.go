@@ -81,6 +81,14 @@ func checkAndCreateFolder(filepath string) error {
 	return nil
 }
 
+// removes all files in directory and the directory itself 
+func checkAndRemoveFolder(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return os.RemoveAll(path)
+	}
+	return nil
+}
+
 func SaveToJSON(filepath string, object interface{}) error {
 	
 	// check if folder exists
